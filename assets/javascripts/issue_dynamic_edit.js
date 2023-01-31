@@ -30,7 +30,7 @@ if (_CONF_FORCE_HTTPS) {
 	LOCATION_HREF = LOCATION_HREF.replace(/^http:\/\//i, 'https://');
 }
 
-/* Check if admin want to display all editable fields when hovering the whole details block 
+/* Check if admin want to display all editable fields when hovering the whole details block
  * or if user has to hover every element to discover if (s)he can edit it
  */
 if (_CONF_DISPLAY_EDIT_ICON === "block"){
@@ -86,7 +86,7 @@ var getEditFormHTML = function(attribute){
 			}
 		}
 	}
-	
+
 	if(formElement.length){
 		var clone = formElement.clone();
 		if(clone.is('select') && !clone.prop('multiple')) clone.on('change', function(e){sendData($(this).serializeArray());});
@@ -112,11 +112,11 @@ var cloneEditForm = function(){
 
 	$('div.issue.details .attribute').each(function(){
 		var classList = $(this).attr('class').split(/\s+/);
-		
+
 		var attributes = classList.filter(function(elem) { return elem != "attribute"; });
 		// Specific case : all "-" are replaced by "_" into form id
 		attributes = attributes.map(attr => attr.replaceAll('-', '_'));
-		
+
 		let custom_field = false;
 		attributes.forEach(function(part, index, arr) {
 		  if(arr[index] === "progress") arr[index] = "done_ratio";
@@ -125,7 +125,7 @@ var cloneEditForm = function(){
 		  	custom_field = arr[index];
 		  }
 		});
-		
+
 		attributes = attributes.join(" ");
 
 		let selected_elt = custom_field ? custom_field : attributes;
@@ -163,7 +163,7 @@ var cloneEditForm = function(){
   	}
 }
 
-/* Perform action on .value (display edit form) */ 
+/* Perform action on .value (display edit form) */
 $('body').on(_CONF_LISTENER_TYPE_VALUE,
 	'div.issue.details .attributes .attribute .' + _CONF_LISTENER_TARGET + ', div.issue.details div.description > p, div.issue.details div.subject',
  	function(e){
@@ -175,14 +175,17 @@ $('body').on(_CONF_LISTENER_TYPE_VALUE,
 			} else {
 				$(this).find('.dynamicEditField').addClass('open');
 			}
+			e.stopPropagation();
 		}
+
 });
 
 /* Perform action on .iconEdit (display edit form) */
-$('body').on(_CONF_LISTENER_TYPE_ICON, 
+$('body').on(_CONF_LISTENER_TYPE_ICON,
 	'div.issue.details .iconEdit', function(e){
 	$('.dynamicEditField').each(function(e){ $(this).removeClass('open'); });
 	$(this).parent().find('.dynamicEditField').addClass('open');
+	//e.stopPropagation(); // title edit icon
 });
 
 /* Perform data update when clicking on valid button from edit form */
@@ -191,13 +194,24 @@ $('body').on('click', '.dynamicEditField .action.valid', function(e){
 	var input = $(this).parents('.dynamicEditField').find(':input');
 	sendData(input.serializeArray());
 	$(this).parents('.dynamicEditField').removeClass('open');
+	e.stopPropagation();
 });
 
 /* Hide edit form when clicking on cancel button */
 $('body').on('click', '.dynamicEditField .action.refuse', function(e){
 	e.preventDefault();
 	$(this).parents('.dynamicEditField').removeClass('open');
+	e.stopPropagation();
 });
+
+$('body').on('click', function(e){
+	if ($('.dynamicEditField').hasClass('open')) {
+		if (!$(e.target).closest('.dynamicEditField').length) {
+			$('.dynamicEditField').removeClass('open');
+		}
+	}
+});
+
 
 /* Update whole .details block + history + form with global refresh button */
 $('body').on('click', '.refreshData', function(e){
@@ -228,7 +242,7 @@ let checkVersion = function(callback){
 					success: function(msg) {
 						let parsed = $.parseHTML(msg);
 						let current_version = $(parsed).find('#issue_lock_version').val();
-						
+
 						if(current_version !== $('#issue_lock_version').val()){
 							if(!$('#content .conflict').length){
 								$('#content').prepend(`

@@ -4,9 +4,9 @@ require_relative './lib/details_issue_hooks.rb'
 
 Redmine::Plugin.register :redmine_issue_dynamic_edit do
   name 'Redmine Dynamic edit Issue plugin'
-  author 'Hugo Zilliox'
+  author 'Hugo Zilliox | ablida'
   description 'Allows users to dynamically update issue attributes in detailed view without refreshing the page (JIRA style)'
-  version '0.8.1'
+  version '0.8.1.1'
   url 'https://github.com/ilogeek/redmine_issue_dynamic_edit'
   author_url 'https://hzilliox.fr'
 end
